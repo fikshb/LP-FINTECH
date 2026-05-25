@@ -165,8 +165,11 @@ h4{font-family:'Poppins',sans-serif;font-size:20px;font-weight:600;line-height:1
 .guide-layout{display:grid;grid-template-columns:1fr 350px;gap:48px;align-items:stretch;max-width:1100px;margin:0 auto}
 .dual-flow{display:grid;grid-template-columns:1fr 1fr;gap:48px;max-width:1100px;margin:0 auto}
 .dual-flow .flow-diagram{max-width:none;margin:0}
-.doc-video{border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.1);align-self:stretch}
+.doc-video{border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.1);align-self:stretch;position:relative}
 .doc-video video{width:100%;height:100%;object-fit:cover;display:block}
+.play-btn{position:absolute;inset:0;margin:auto;width:72px;height:72px;border:none;background:none;cursor:pointer;z-index:2;opacity:.9;transition:opacity .3s,transform .3s}
+.play-btn:hover{opacity:1;transform:scale(1.1)}
+.play-btn.hidden{opacity:0;pointer-events:none}
 
 /* ===== LAYOUTS ===== */
 .split{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
@@ -281,7 +284,8 @@ h4{font-family:'Poppins',sans-serif;font-size:20px;font-weight:600;line-height:1
 @media(max-width:1024px){
   html{scroll-snap-type:none}
   section{height:auto;min-height:0;scroll-snap-align:none;padding:80px 0}
-  .nav{padding:0 24px}.nav-links{display:none}
+  .hero-slide,.hero-content-slide{min-height:100vh;min-height:100svh;padding:0}
+  .nav{padding:0 24px}.nav-links{display:none}.nav-cta{display:none}
   .container,.container-narrow{padding:0 24px}
   .hero-intro-logos img{height:32px}
   .split,.split-55,.grid-3,.grid-2{grid-template-columns:1fr;gap:24px}
@@ -299,10 +303,17 @@ h4{font-family:'Poppins',sans-serif;font-size:20px;font-weight:600;line-height:1
   .dual-flow .flow-diagram{flex-direction:column;gap:20px}
   .dual-flow .flow-cards{margin-left:0}
   .pricing-wide{width:100%;margin-left:0;grid-template-columns:1fr}
+  .rotate-word{font-size:clamp(20px,5.5vw,36px);letter-spacing:1px;padding:4px 14px}
+  .rotate-block{height:clamp(36px,7vw,60px)}
 }
 @media(max-width:640px){
   section{padding:60px 0}
+  .hero-slide,.hero-content-slide{min-height:100vh;min-height:100svh;padding:0}
   .hero-actions{flex-direction:column;align-items:flex-start}
+  .rotate-word{font-size:clamp(16px,4.8vw,28px);letter-spacing:0.5px;padding:3px 10px}
+  .rotate-block{height:clamp(28px,6vw,44px)}
+  .hero-content-slide h1{font-size:clamp(28px,7vw,42px)}
+  .hero-sub,.hero-sub-after{font-size:clamp(16px,4vw,22px)}
 }
 </style>
 </head>
@@ -484,7 +495,8 @@ h4{font-family:'Poppins',sans-serif;font-size:20px;font-weight:600;line-height:1
         </div>
       </div>
       <div class="doc-video reveal d2">
-        <video id="guideVideo" src="../Resource/dokumentasi-acara-compressed.mp4" loop playsinline></video>
+        <video id="guideVideo" src="../Resource/dokumentasi-acara-compressed.mp4" playsinline></video>
+        <button id="guidePlayBtn" class="play-btn" aria-label="Play video"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="23" stroke="white" stroke-width="2" fill="rgba(0,0,0,0.4)"/><polygon points="19,14 19,34 36,24" fill="white"/></svg></button>
       </div>
     </div>
   </div>
@@ -760,37 +772,22 @@ const vidObserver = new IntersectionObserver(entries => {
 }, { threshold: 0.25 });
 vidSections.forEach(s => vidObserver.observe(s));
 
-// Guide video — auto play with sound when section visible, pause when not
+// Guide video — click to play/pause with sound
 const guideVideo = document.getElementById('guideVideo');
-const guideSection = document.getElementById('proof');
-if (guideVideo && guideSection) {
-  let userInteracted = false;
-  ['click','scroll','keydown','touchstart'].forEach(evt => {
-    window.addEventListener(evt, () => { userInteracted = true; }, { once: false, passive: true });
-  });
-
-  function tryPlay() {
-    guideVideo.muted = false;
-    const p = guideVideo.play();
-    if (p) p.catch(() => {
-      guideVideo.muted = true;
-      guideVideo.play().then(() => {
-        if (userInteracted) guideVideo.muted = false;
-      }).catch(() => {});
-    });
+const guidePlayBtn = document.getElementById('guidePlayBtn');
+if (guideVideo && guidePlayBtn) {
+  function toggleGuide() {
+    if (guideVideo.paused) {
+      guideVideo.play();
+      guidePlayBtn.classList.add('hidden');
+    } else {
+      guideVideo.pause();
+      guidePlayBtn.classList.remove('hidden');
+    }
   }
-
-  const guideObs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        tryPlay();
-      } else {
-        guideVideo.pause();
-        guideVideo.currentTime = 0;
-      }
-    });
-  }, { threshold: 0.15 });
-  guideObs.observe(guideSection);
+  guidePlayBtn.addEventListener('click', toggleGuide);
+  guideVideo.addEventListener('click', toggleGuide);
+  guideVideo.addEventListener('ended', () => { guidePlayBtn.classList.remove('hidden'); });
 }
 </script>
 </body>
