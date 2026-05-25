@@ -2,6 +2,11 @@
 *.mov
 Resource/animated-fintech-line-icons-pack-with-alpha-channe-*.zip
 
+# Original uncompressed videos (replaced by compressed versions)
+Resource/Dokumentasi Acara.mp4
+Resource/fintech-digital-glitch-text-reveal-animation-*.mp4
+Resource/futuristic-digital-code-glitch-logo-reveal-*.mp4
+
 # Source images (converted to webp)
 Resource/fikrishahab.png
 Resource/hilda.png
