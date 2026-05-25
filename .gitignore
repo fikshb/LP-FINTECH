@@ -1,0 +1,15 @@
+# Large source files (ProRes 4K .mov, 100MB+ each)
+*.mov
+Resource/animated-fintech-line-icons-pack-with-alpha-channe-*.zip
+
+# Source images (converted to webp)
+Resource/fikrishahab.png
+Resource/hilda.png
+Resource/fintech-icons/thumbs/
+Resource/flow-reference.png
+
+# Reference PDFs (confidential)
+Reference/
+
+# Claude internal
+.claude/
